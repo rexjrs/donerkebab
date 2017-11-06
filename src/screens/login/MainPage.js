@@ -9,24 +9,49 @@ import {
     TextInput,
     ScrollView,
     Dimensions,
-    LayoutAnimation
+    LayoutAnimation,
+    AsyncStorage
 } from 'react-native';
+import * as firebase from 'firebase';
 import LinearGradient from 'react-native-linear-gradient';
+import { getUserData } from '../../../src/network/Firebase';
 import { observer, inject } from 'mobx-react';
 
 @inject('mainStore')
 @observer export default class MainPage extends Component {
-    constructor(props){
+    constructor(props) {
         super(props)
-        this.state={
+        this.state = {
 
         }
         this.login = this.login.bind(this)
     }
 
-    login(){
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.linear); 
-        this.props.mainStore.authPass = true
+    login() {
+        firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+            .then((user) => {
+                user.getIdToken().then((token) => {
+                    AsyncStorage.setItem('token', token);
+                    AsyncStorage.setItem('email', this.state.email);
+                    this.fetchUser(token);
+                });
+            })
+            .catch((err) => {
+                console.warn('Failed')
+            });
+    }
+
+    fetchUser(token) {
+        getUserData(this.props.screenProps.db, this.state.email, (res) => {
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
+            AsyncStorage.setItem('id', res);
+            this.props.mainStore.userData = {
+                token: token,
+                email: this.state.email,
+                id: res
+            }
+            this.props.mainStore.authPass = true
+        })
     }
 
     render() {
@@ -36,38 +61,44 @@ import { observer, inject } from 'mobx-react';
                 style={styles.container}
             >
                 <ScrollView style={styles.scrollView} scrollEnabled={false}>
-                <View style={styles.centerItems}>
-                    <TextInput
-                        style={styles.desc}
-                        placeholder='Email'
-                        placeholderTextColor='rgba(170,170,170,0.9)'
-                    />
-                    <TextInput
-                        style={styles.desc}
-                        placeholder='Password'
-                        placeholderTextColor='rgba(170,170,170,0.9)'
-                        secureTextEntry={true}
-                    />
-                    <TouchableOpacity onPress={this.login} style={styles.submitBtn}>
-                        <Text style={styles.submitText}>Login</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.googleBtn}>
-                        <Text style={styles.submitText}>Google</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.facebookBtn}>
-                        <Text style={styles.submitText}>Facebook</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('SignUp')} style={styles.needAcc}>
-                        <Text style={styles.needAccText}>Need an account?</Text>
-                    </TouchableOpacity>
-                </View>
+                    <View style={styles.centerItems}>
+                        <TextInput
+                            style={styles.desc}
+                            placeholder='Email'
+                            placeholderTextColor='rgba(170,170,170,0.9)'
+                            value={this.state.email}
+                            onChangeText={(val) => this.setState({ email: val })}
+                            autoCapitalize='none'
+                            autoCorrect={false}
+                        />
+                        <TextInput
+                            style={styles.desc}
+                            placeholder='Password'
+                            placeholderTextColor='rgba(170,170,170,0.9)'
+                            secureTextEntry={true}
+                            value={this.state.password}
+                            onChangeText={(val) => this.setState({ password: val })}
+                        />
+                        <TouchableOpacity onPress={this.login} style={styles.submitBtn}>
+                            <Text style={styles.submitText}>Login</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.googleBtn}>
+                            <Text style={styles.submitText}>Google</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.facebookBtn}>
+                            <Text style={styles.submitText}>Facebook</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('SignUp')} style={styles.needAcc}>
+                            <Text style={styles.needAccText}>Need an account?</Text>
+                        </TouchableOpacity>
+                    </View>
                 </ScrollView>
             </LinearGradient>
         );
     }
 }
 
-const window = Dimensions.get('window'); 
+const window = Dimensions.get('window');
 
 const styles = StyleSheet.create({
     container: {
@@ -75,7 +106,7 @@ const styles = StyleSheet.create({
     },
     scrollView: {
         flex: 1,
-        paddingTop: (window.height/2)-140
+        paddingTop: (window.height / 2) - 140
     },
     centerItems: {
     },

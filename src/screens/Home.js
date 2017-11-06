@@ -13,8 +13,10 @@ import Post from '../components/home/Post';
 import Seperator from '../components/home/Seperator';
 import LinearGradient from 'react-native-linear-gradient';
 import { Icon } from 'react-native-elements';
+import { observer, inject } from 'mobx-react';
 
-export default class Home extends Component {
+@inject('mainStore')
+@observer export default class Home extends Component {
     constructor(props){
         super(props)
         this.state={
@@ -49,6 +51,7 @@ export default class Home extends Component {
     }
 
     render() {
+        console.log(this.props.mainStore)
         return (
             <LinearGradient
                 colors={['#102037', '#1e3353']}

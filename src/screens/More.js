@@ -7,7 +7,8 @@ import {
     Image,
     TouchableOpacity,
     ScrollView,
-    LayoutAnimation
+    LayoutAnimation,
+    AsyncStorage
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
@@ -46,8 +47,12 @@ import { observer, inject } from 'mobx-react';
                     icon: 'ios-exit-outline',
                     last: true,
                     onPress: () => {
+                        AsyncStorage.removeItem('token')
+                        AsyncStorage.removeItem('email')
+                        AsyncStorage.removeItem('id')
                         LayoutAnimation.configureNext(LayoutAnimation.Presets.linear)
                         this.props.mainStore.authPass = false
+                        this.props.mainStore.needLogin = true
                     }
                 }
             ]
