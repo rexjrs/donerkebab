@@ -9,8 +9,7 @@ import {
     LayoutAnimation,
     TouchableWithoutFeedback
 } from 'react-native';
-import Post from '../components/home/Post';
-import Seperator from '../components/home/Seperator';
+import List from '../components/home/List';
 import LinearGradient from 'react-native-linear-gradient';
 import { Icon } from 'react-native-elements';
 import { observer, inject } from 'mobx-react';
@@ -51,19 +50,12 @@ import { observer, inject } from 'mobx-react';
     }
 
     render() {
-        console.log(this.props.mainStore)
         return (
             <LinearGradient
                 colors={['#102037', '#1e3353']}
                 style={styles.container}
             >
-                <ScrollView>
-                    <Seperator />
-                    <Post />
-                    <Post />
-                    <Seperator />
-                    <Post />
-                </ScrollView>
+                <List screenProps={this.props.screenProps}/>
                 <TouchableOpacity onPress={() => this.navigate('Log Meal')} style={[styles.foodBtn, {bottom: this.state.foodBtn}]}>
                     <Icon name="ios-restaurant" type="ionicon" size={35} color="#6764fe" />
                 </TouchableOpacity>

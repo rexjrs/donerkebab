@@ -5,7 +5,6 @@ import {
     Text,
     View,
     TouchableOpacity,
-    Image
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 

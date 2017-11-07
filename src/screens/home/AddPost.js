@@ -5,7 +5,6 @@ import {
     Text,
     View,
     TouchableOpacity,
-    Image,
     ScrollView,
     TextInput
 } from 'react-native';
@@ -133,7 +132,7 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         backgroundColor: '#F8F8F8',
-        height: 250,
+        height: 220,
         margin: 10,
         alignItems: 'center',
         justifyContent: 'center'

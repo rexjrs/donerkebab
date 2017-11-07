@@ -5,29 +5,34 @@ import {
     Text,
     View,
     TouchableOpacity,
-    Image
 } from 'react-native';
+import moment from 'moment';
 import { Icon } from 'react-native-elements';
 
-export default class Post extends Component {
+export default class Post extends React.PureComponent {
     render() {
+        let today = moment()
+        let date = this.props.item.date
+        if(today.diff(date, 'days') < 5){
+            date = moment(date).startOf('day').fromNow()
+        }else{
+            date = moment(date).format('DD MMM YYYY, h:mm a')
+        }
         return (
             <View
                 style={styles.container}
             >
                 <View style={styles.top}>
-                    <Image style={styles.profile} source={require('../../../assets/thomas.jpg')} />
-                    <Text style={styles.title}>Garlic Chicken and Teriyaki Sauce</Text>
+                    <Text style={styles.title}>{this.props.item.userData.firstName+' '+this.props.item.userData.lastName}</Text>
                 </View>
                 <View style={styles.descriptionContainer}>
-                    <Text style={styles.description}>This was a wondering peice of chicken I had at the local diner today!</Text>
+                    <Text style={styles.description}>{this.props.item.description}</Text>
                 </View>
                 <View style={styles.imageContainer}>
-                    <Image style={styles.image} source={require('../../../assets/garlic.jpg')} />
                 </View>
                 <TouchableOpacity style={styles.commentsContainer}>
                     <View style={styles.timeFlex}>
-                        <Text style={styles.title}>1 week ago...</Text>
+                        <Text style={styles.title}>{date}</Text>
                     </View>
                     <View style={styles.commentFlex}>
                         <Text style={styles.title}>Comments (12)</Text>

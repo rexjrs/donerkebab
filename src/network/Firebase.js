@@ -10,3 +10,15 @@ export function getUserData(db,email,callback){
         console.log("Error getting documents: ", error);
     });
 }
+
+export function getFeed(db,id,callback){
+    db.collection("posts").where("userId", "==", id)
+    .get()
+    .then(function (querySnapshot) {
+        callback(true,querySnapshot)
+    })
+    .catch(function (error) {
+        callback(false)
+        console.log("Error getting documents: ", error);
+    });
+}
