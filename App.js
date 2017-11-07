@@ -13,6 +13,36 @@ import 'firebase/firestore';
 import { mainStore } from './src/stores/MainStore';
 import { Tabs, LoginStack } from './src/routing/Router';
 import { Provider, observer } from 'mobx-react';
+
+class FakeImage {
+    static ensureImageExists() {
+        if (!global.Image) {
+            global.Image = FakeImage;
+        }
+    }
+
+    _isLoaded = false;
+    _callbacks = [];
+
+    set src(url) {
+        this._isLoaded = false;
+        this.load(url);
+    }
+
+    load = async (url) => {
+        await fetch(url);
+        this._callbacks.forEach(x => x());
+        this._isLoaded = true;
+    };
+
+    onload(callback) {
+        if (this._isLoaded) { callback(); }
+        this._callbacks.push(callback);
+    }
+}
+
+FakeImage.ensureImageExists();
+
 const config = {
     apiKey: "AIzaSyC-d-TWhGDOWxEgkc94uZrZK5irRh8FE4Y",
     authDomain: "donerkebab-e1ded.firebaseapp.com",

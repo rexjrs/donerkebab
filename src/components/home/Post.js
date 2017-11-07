@@ -5,6 +5,7 @@ import {
     Text,
     View,
     TouchableOpacity,
+    Image
 } from 'react-native';
 import moment from 'moment';
 import { Icon } from 'react-native-elements';
@@ -23,12 +24,14 @@ export default class Post extends React.PureComponent {
                 style={styles.container}
             >
                 <View style={styles.top}>
+                    <Image source={{uri: this.props.item.userData.image}} style={styles.profile}/>
                     <Text style={styles.title}>{this.props.item.userData.firstName+' '+this.props.item.userData.lastName}</Text>
                 </View>
                 <View style={styles.descriptionContainer}>
                     <Text style={styles.description}>{this.props.item.description}</Text>
                 </View>
                 <View style={styles.imageContainer}>
+                    <Image source={{uri: this.props.item.image}} style={styles.image}/>
                 </View>
                 <TouchableOpacity style={styles.commentsContainer}>
                     <View style={styles.timeFlex}>

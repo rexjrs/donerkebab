@@ -43,7 +43,7 @@ import { observer, inject } from 'mobx-react';
                     calories: doc.data().calories,
                     date: doc.data().date,
                     description: doc.data().description,
-                    //image: doc.data().image,
+                    image: doc.data().image,
                     type: doc.data().type,
                     userId: doc.data().userId
                 }
@@ -54,7 +54,7 @@ import { observer, inject } from 'mobx-react';
                             email: querySnapshot.data().email,
                             firstName: querySnapshot.data().firstName,
                             lastName: querySnapshot.data().lastName,
-                            //image: querySnapshot.data().image
+                            image: querySnapshot.data().image
                         }
                         tempArray.push(tempObj)
                         counter = counter + 1
