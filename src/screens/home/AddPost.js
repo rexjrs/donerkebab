@@ -6,17 +6,48 @@ import {
     View,
     TouchableOpacity,
     ScrollView,
-    TextInput
+    TextInput,
+    Image
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import ImagePicker from 'react-native-image-crop-picker';
 import { Icon } from 'react-native-elements';
 
 export default class AddPost extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            type: 'Breakfast'
+            type: 'Breakfast',
+            description: '',
+            calsBurned: '',
+            cals: '',
+            image: null
         }
+        this.submitPost = this.submitPost.bind(this)
+    }
+
+    componentWillMount() {
+        if (this.props.navigation.state.params.name === 'Log Exercise') {
+            this.setState({
+                type: 'Exercise'
+            })
+        }
+    }
+
+
+    submitPost() {
+        let data = {
+            type: this.state.type,
+            description: this.state.description,
+            image: this.state.image
+        }
+        if (this.state.type === 'Exercise') {
+            data.calsBurned = this.state.calsBurned
+        } else {
+            data.cals = this.state.cals
+        }
+        this.props.navigation.state.params.queueUpload(data)
+        this.props.navigation.goBack()
     }
 
     changeType(type) {
@@ -25,10 +56,54 @@ export default class AddPost extends Component {
         })
     }
 
+    getImage(type) {
+        switch (type) {
+            case ('camera'):
+                ImagePicker.openCamera({
+                    includeBase64: true,
+                    compressImageMaxHeight: 1000,
+                    compressImageMaxWidth: 2000,
+                    compressImageQuality: 0.75
+                }).then(image => {
+                    this.setState({
+                        mime: image.mime,
+                        image: image.data
+                    })
+                });
+                break;
+            case ('gallery'):
+                ImagePicker.openPicker({
+                    includeBase64: true,
+                    compressImageMaxHeight: 1000,
+                    compressImageMaxWidth: 2000,
+                    compressImageQuality: 0.75
+                }).then(image => {
+                    this.setState({
+                        mime: image.mime,
+                        image: image.data
+                    })
+                });
+                break;
+            default:
+                ImagePicker.openCamera({
+                    includeBase64: true,
+                    compressImageMaxHeight: 1000,
+                    compressImageMaxWidth: 2000,
+                    compressImageQuality: 0.75
+                }).then(image => {
+                    this.setState({
+                        mime: image.mime,
+                        image: image.data
+                    })
+                });
+                break;
+        }
+    }
+
     render() {
         let type = 'Meal'
         let desc = 'What did you eat?'
-        if(this.props.navigation.state.params.name === 'Log Exercise'){
+        if (this.props.navigation.state.params.name === 'Log Exercise') {
             type = 'Exercise'
             desc = 'What did you do?'
         }
@@ -38,59 +113,76 @@ export default class AddPost extends Component {
                 style={styles.container}
             >
                 <ScrollView>
-                    <TouchableOpacity style={styles.imageContainer}>
-                        <Icon type="ionicon" name="ios-images" size={40} color="gray" />
-                    </TouchableOpacity>
+                    {this.state.image &&
+                        <View style={styles.imageContainer}>
+                            <Image source={{uri: `data:${this.state.mime};base64,`+ this.state.image}} style={styles.image} resizeMode="cover"/>
+                        </View>
+                    }
+                    {!this.state.image &&
+                        <View style={styles.imageContainer}>
+                            <TouchableOpacity onPress={() => this.getImage('gallery')} style={styles.imageButtons}>
+                                <Icon type="ionicon" name="ios-images" size={40} color="gray" />
+                                <Text>Select from Gallery</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.getImage('camera')} style={styles.imageButtons}>
+                                <Icon type="ionicon" name="ios-camera" size={40} color="gray" />
+                                <Text>Take a picture</Text>
+                            </TouchableOpacity>
+                        </View>
+                    }
                     <TextInput
                         style={styles.desc}
                         placeholder={desc}
                         placeholderTextColor='rgba(170,170,170,0.9)'
+                        value={this.state.description}
+                        onChangeText={(val) => this.setState({ description: val })}
                     />
                     {this.props.navigation.state.params.name === 'Log Exercise' &&
-                    <TextInput
-                        style={styles.calsBurned}
-                        placeholder="Calories burned"
-                        placeholderTextColor='rgba(170,170,170,0.9)'
-                        keyboardType="number-pad"
-                    />
+                        <TextInput
+                            style={styles.calsBurned}
+                            placeholder="Calories burned"
+                            placeholderTextColor='rgba(170,170,170,0.9)'
+                            keyboardType="number-pad"
+                            value={this.state.calsBurned}
+                            onChangeText={(val) => this.setState({ calsBurned: val })}
+                        />
                     }
                     {this.props.navigation.state.params.name !== 'Log Exercise' &&
-                    <TextInput
-                        style={styles.cals}
-                        placeholder="Calories"
-                        placeholderTextColor='rgba(170,170,170,0.9)'
-                        keyboardType="number-pad"
-                    />
+                        <TextInput
+                            style={styles.cals}
+                            placeholder="Calories"
+                            placeholderTextColor='rgba(170,170,170,0.9)'
+                            keyboardType="number-pad"
+                            value={this.state.cals}
+                            onChangeText={(val) => this.setState({ cals: val })}
+                        />
                     }
                     {this.props.navigation.state.params.name !== 'Log Exercise' &&
-                    <View style={styles.optionContainer}>
-                        <View style={[styles.optionFlex, { alignItems: 'flex-start' }]}>
-                            <TouchableOpacity onPress={() => this.changeType('Breakfast')} style={[styles.option, this.state.type !== 'Breakfast' && styles.optionDisabled]}>
-                                <Text style={[styles.optionText, this.state.type !== 'Breakfast' && styles.optionTextDisabled]}>Breakfast</Text>
-                            </TouchableOpacity>
+                        <View style={styles.optionContainer}>
+                            <View style={[styles.optionFlex, { alignItems: 'flex-start' }]}>
+                                <TouchableOpacity onPress={() => this.changeType('Breakfast')} style={[styles.option, this.state.type !== 'Breakfast' && styles.optionDisabled]}>
+                                    <Text style={[styles.optionText, this.state.type !== 'Breakfast' && styles.optionTextDisabled]}>Breakfast</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={[styles.optionFlex]}>
+                                <TouchableOpacity onPress={() => this.changeType('Lunch')} style={[styles.option, this.state.type !== 'Lunch' && styles.optionDisabled]}>
+                                    <Text style={[styles.optionText, this.state.type !== 'Lunch' && styles.optionTextDisabled]}>Lunch</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={[styles.optionFlex]}>
+                                <TouchableOpacity onPress={() => this.changeType('Dinner')} style={[styles.option, this.state.type !== 'Dinner' && styles.optionDisabled]}>
+                                    <Text style={[styles.optionText, this.state.type !== 'Dinner' && styles.optionTextDisabled]}>Dinner</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={[[styles.optionFlex, { alignItems: 'flex-end' }]]}>
+                                <TouchableOpacity onPress={() => this.changeType('Snack')} style={[styles.option, this.state.type !== 'Snack' && styles.optionDisabled]}>
+                                    <Text style={[styles.optionText, this.state.type !== 'Snack' && styles.optionTextDisabled]}>Snack</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                        <View style={[styles.optionFlex]}>
-                            <TouchableOpacity onPress={() => this.changeType('Lunch')} style={[styles.option, this.state.type !== 'Lunch' && styles.optionDisabled]}>
-                                <Text style={[styles.optionText, this.state.type !== 'Lunch' && styles.optionTextDisabled]}>Lunch</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={[styles.optionFlex]}>
-                            <TouchableOpacity onPress={() => this.changeType('Dinner')} style={[styles.option, this.state.type !== 'Dinner' && styles.optionDisabled]}>
-                                <Text style={[styles.optionText, this.state.type !== 'Dinner' && styles.optionTextDisabled]}>Dinner</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={[[styles.optionFlex, { alignItems: 'flex-end' }]]}>
-                            <TouchableOpacity onPress={() => this.changeType('Snack')} style={[styles.option, this.state.type !== 'Snack' && styles.optionDisabled]}>
-                                <Text style={[styles.optionText, this.state.type !== 'Snack' && styles.optionTextDisabled]}>Snack</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
                     }
-                    <TouchableOpacity style={styles.date}>
-                        <Text style={styles.dateText}>2017-11-04</Text>
-                    </TouchableOpacity>
                 </ScrollView>
-                <TouchableOpacity style={styles.submitBtn}>
+                <TouchableOpacity onPress={this.submitPost} style={styles.submitBtn}>
                     <Text style={styles.submitText}>Add {type}</Text>
                 </TouchableOpacity>
             </LinearGradient>
@@ -114,6 +206,10 @@ const styles = StyleSheet.create({
     optionDisabled: {
         backgroundColor: '#122333',
     },
+    image: {
+        height: '100%',
+        width: '100%'
+    },
     option: {
         height: 40,
         width: '95%',
@@ -134,8 +230,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8F8F8',
         height: 220,
         margin: 10,
-        alignItems: 'center',
-        justifyContent: 'center'
+        flexDirection: 'row'
     },
     desc: {
         color: 'white',
@@ -145,6 +240,12 @@ const styles = StyleSheet.create({
         paddingVertical: 3,
         backgroundColor: '#122333',
         paddingLeft: 10
+    },
+    imageButtons: {
+        flex: 0.5,
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     cals: {
         color: 'white',

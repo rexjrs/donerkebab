@@ -12,36 +12,8 @@ import * as firebase from 'firebase';
 import 'firebase/firestore';
 import { mainStore } from './src/stores/MainStore';
 import { Tabs, LoginStack } from './src/routing/Router';
+import { FakeImage } from './src/config/HelperFunctions';
 import { Provider, observer } from 'mobx-react';
-
-class FakeImage {
-    static ensureImageExists() {
-        if (!global.Image) {
-            global.Image = FakeImage;
-        }
-    }
-
-    _isLoaded = false;
-    _callbacks = [];
-
-    set src(url) {
-        this._isLoaded = false;
-        this.load(url);
-    }
-
-    load = async (url) => {
-        await fetch(url);
-        this._callbacks.forEach(x => x());
-        this._isLoaded = true;
-    };
-
-    onload(callback) {
-        if (this._isLoaded) { callback(); }
-        this._callbacks.push(callback);
-    }
-}
-
-FakeImage.ensureImageExists();
 
 const config = {
     apiKey: "AIzaSyC-d-TWhGDOWxEgkc94uZrZK5irRh8FE4Y",
@@ -51,8 +23,10 @@ const config = {
     storageBucket: "donerkebab-e1ded.appspot.com",
     messagingSenderId: "531243947613"
 };
+FakeImage.ensureImageExists(); //Workaround Firestore issue
 firebase.initializeApp(config);
 const db = firebase.firestore();
+const storage = firebase.storage().ref();
 
 @observer export default class App extends Component {
     constructor(props) {
@@ -98,7 +72,8 @@ const db = firebase.firestore();
                     {mainStore.authPass &&
                         <Tabs
                             screenProps={{
-                                db: db
+                                db: db,
+                                storage: storage
                             }}
                         />
                     }

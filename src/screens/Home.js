@@ -13,6 +13,7 @@ import List from '../components/home/List';
 import LinearGradient from 'react-native-linear-gradient';
 import { Icon } from 'react-native-elements';
 import { observer, inject } from 'mobx-react';
+import RNFetchBlob from 'react-native-fetch-blob';
 
 @inject('mainStore')
 @observer export default class Home extends Component {
@@ -23,10 +24,31 @@ import { observer, inject } from 'mobx-react';
             foodBtn: 10,
             exerciseBtn: 20
         }
+        this.queueUpload = this.queueUpload.bind(this)
+    }
+
+    queueUpload(data){
+//Prepare polyfill
+const Blob = RNFetchBlob.polyfill.Blob
+const fs = RNFetchBlob.fs
+window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+window.Blob = Blob
+        // ready.on(this.props.screenProps.storage.TaskEvent.STATE_CHANGED,
+        // (snapshot)=>{
+        //     console.log(snapshot)
+        // }, (error)=>{
+        //     console.log(error)
+        // },(result)=>{
+        //     console.log(result)
+        // })
+        
     }
 
     navigate(page){
-        this.props.navigation.navigate('AddPost', {name: page})
+        this.props.navigation.navigate('AddPost', {
+            name: page,
+            queueUpload: this.queueUpload
+        })
         this.showBtn(!this.state.showBtn, true)
     }
 
