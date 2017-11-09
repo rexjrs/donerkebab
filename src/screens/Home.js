@@ -11,15 +11,16 @@ import {
 } from 'react-native';
 import List from '../components/home/List';
 import LinearGradient from 'react-native-linear-gradient';
+import { uploadImage } from '../network/Firebase';
 import { Icon } from 'react-native-elements';
 import { observer, inject } from 'mobx-react';
-import RNFetchBlob from 'react-native-fetch-blob';
+import moment from 'moment';
 
 @inject('mainStore')
 @observer export default class Home extends Component {
-    constructor(props){
+    constructor(props) {
         super(props)
-        this.state={
+        this.state = {
             showBtn: true,
             foodBtn: 10,
             exerciseBtn: 20
@@ -27,24 +28,22 @@ import RNFetchBlob from 'react-native-fetch-blob';
         this.queueUpload = this.queueUpload.bind(this)
     }
 
-    queueUpload(data){
-//Prepare polyfill
-const Blob = RNFetchBlob.polyfill.Blob
-const fs = RNFetchBlob.fs
-window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
-window.Blob = Blob
-        // ready.on(this.props.screenProps.storage.TaskEvent.STATE_CHANGED,
-        // (snapshot)=>{
-        //     console.log(snapshot)
-        // }, (error)=>{
-        //     console.log(error)
-        // },(result)=>{
-        //     console.log(result)
-        // })
-        
+    queueUpload(data) {
+        const imageRef = this.props.screenProps.storage.child("images/"+this.props.mainStore.userData.id+moment().format('YYYYMMDDhmmss')+".jpg")
+        uploadImage(
+            this.props.screenProps.db, 
+            this.props.screenProps.db.collection('users').doc(this.props.mainStore.userData.id),
+            this.props.screenProps.timestamp, 
+            data, 
+            this.props.mainStore.userData.id, 
+            imageRef,
+            (result)=>{
+                console.log(result)
+            }
+        )
     }
 
-    navigate(page){
+    navigate(page) {
         this.props.navigation.navigate('AddPost', {
             name: page,
             queueUpload: this.queueUpload
@@ -52,17 +51,17 @@ window.Blob = Blob
         this.showBtn(!this.state.showBtn, true)
     }
 
-    showBtn(value, noAnimation){
+    showBtn(value, noAnimation) {
         let foodBtn = 10
         let exerciseBtn = 20
-        let type = 'easeInEaseOut'        
-        if(!value){
+        let type = 'easeInEaseOut'
+        if (!value) {
             foodBtn = 70
             exerciseBtn = 75
             type = 'spring'
         }
-        if(!noAnimation){
-            LayoutAnimation.configureNext(LayoutAnimation.Presets[type]);                    
+        if (!noAnimation) {
+            LayoutAnimation.configureNext(LayoutAnimation.Presets[type]);
         }
         this.setState({
             foodBtn: foodBtn,
@@ -77,16 +76,16 @@ window.Blob = Blob
                 colors={['#102037', '#1e3353']}
                 style={styles.container}
             >
-                <List screenProps={this.props.screenProps}/>
-                <TouchableOpacity onPress={() => this.navigate('Log Meal')} style={[styles.foodBtn, {bottom: this.state.foodBtn}]}>
+                <List screenProps={this.props.screenProps} />
+                <TouchableOpacity onPress={() => this.navigate('Log Meal')} style={[styles.foodBtn, { bottom: this.state.foodBtn }]}>
                     <Icon name="ios-restaurant" type="ionicon" size={35} color="#6764fe" />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.navigate('Log Exercise')} style={[styles.exerciseBtn, {right: this.state.exerciseBtn}]}>
+                <TouchableOpacity onPress={() => this.navigate('Log Exercise')} style={[styles.exerciseBtn, { right: this.state.exerciseBtn }]}>
                     <Icon name="ios-walk" type="ionicon" size={40} color="#6764fe" />
                 </TouchableOpacity>
                 <View style={styles.plusBtn}>
-                    <TouchableWithoutFeedback onPress={()=>this.showBtn(!this.state.showBtn)}>
-                    <Icon name="ios-add-circle" type="ionicon" size={50} color="#6764fe" />
+                    <TouchableWithoutFeedback onPress={() => this.showBtn(!this.state.showBtn)}>
+                        <Icon name="ios-add-circle" type="ionicon" size={50} color="#6764fe" />
                     </TouchableWithoutFeedback>
                 </View>
             </LinearGradient>

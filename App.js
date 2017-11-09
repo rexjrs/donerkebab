@@ -27,6 +27,7 @@ FakeImage.ensureImageExists(); //Workaround Firestore issue
 firebase.initializeApp(config);
 const db = firebase.firestore();
 const storage = firebase.storage().ref();
+const timestamp = firebase.firestore.FieldValue.serverTimestamp()
 
 @observer export default class App extends Component {
     constructor(props) {
@@ -73,7 +74,8 @@ const storage = firebase.storage().ref();
                         <Tabs
                             screenProps={{
                                 db: db,
-                                storage: storage
+                                storage: storage,
+                                timestamp: timestamp
                             }}
                         />
                     }

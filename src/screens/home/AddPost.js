@@ -39,7 +39,9 @@ export default class AddPost extends Component {
         let data = {
             type: this.state.type,
             description: this.state.description,
-            image: this.state.image
+            image: this.state.image,
+            path: this.state.imagePath,
+            mime: this.state.mime
         }
         if (this.state.type === 'Exercise') {
             data.calsBurned = this.state.calsBurned
@@ -67,7 +69,8 @@ export default class AddPost extends Component {
                 }).then(image => {
                     this.setState({
                         mime: image.mime,
-                        image: image.data
+                        image: image.data,
+                        imagePath: image.path
                     })
                 });
                 break;
@@ -80,7 +83,8 @@ export default class AddPost extends Component {
                 }).then(image => {
                     this.setState({
                         mime: image.mime,
-                        image: image.data
+                        image: image.data,
+                        imagePath: image.path
                     })
                 });
                 break;
@@ -93,7 +97,8 @@ export default class AddPost extends Component {
                 }).then(image => {
                     this.setState({
                         mime: image.mime,
-                        image: image.data
+                        image: image.data,
+                        imagePath: image.path
                     })
                 });
                 break;

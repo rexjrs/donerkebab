@@ -39,6 +39,7 @@ import { observer, inject } from 'mobx-react';
             let tempArray = []
             let counter = 0
             res.forEach((doc) => {
+                console.log(doc)
                 let tempObj = {
                     calories: doc.data().calories,
                     date: doc.data().date,
