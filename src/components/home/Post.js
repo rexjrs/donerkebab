@@ -11,27 +11,54 @@ import moment from 'moment';
 import { Icon } from 'react-native-elements';
 
 export default class Post extends React.PureComponent {
+
+    getTime(datestring, units) {
+        const diff = moment.duration(moment().diff(moment(datestring)));
+        switch (units) {
+            case 'days':
+                return diff.asDays();
+            case 'minutes':
+                return diff.asMinutes();
+            case 'hours':
+                return diff.asHours();
+            case 'seconds':
+                return diff.asSeconds();
+        }
+    }
+
     render() {
         let today = moment()
         let date = this.props.item.date
-        if(today.diff(date, 'days') < 5){
-            date = moment(date).startOf('day').fromNow()
-        }else{
-            date = moment(date).format('DD MMM YYYY, h:mm a')
+        if (this.getTime(date, 'seconds') < 60) {
+            date = parseInt(this.getTime(date, 'seconds')) + ' seconds ago'
+        } else {
+            if (this.getTime(date, 'minutes') < 60) {
+                date = parseInt(this.getTime(date, 'minutes')) + ' minutes ago'
+            } else {
+                if (this.getTime(date, 'hours') < 24) {
+                    date = parseInt(this.getTime(date, 'hours')) + ' hours ago'
+                } else {
+                    if (today.diff(date, 'days') < 5) {
+                        date = parseInt(this.getTime(date, 'days')) + ' days ago'
+                    } else {
+                        date = moment(date).local().format('DD MMM YYYY, h:mm a')
+                    }
+                }
+            }
         }
         return (
             <View
                 style={styles.container}
             >
                 <View style={styles.top}>
-                    <Image source={{uri: this.props.item.userData.image}} style={styles.profile}/>
-                    <Text style={styles.title}>{this.props.item.userData.firstName+' '+this.props.item.userData.lastName}</Text>
+                    <Image source={{ uri: this.props.item.userData.image }} style={styles.profile} />
+                    <Text style={styles.title}>{this.props.item.userData.firstName + ' ' + this.props.item.userData.lastName}</Text>
                 </View>
                 <View style={styles.descriptionContainer}>
                     <Text style={styles.description}>{this.props.item.description}</Text>
                 </View>
                 <View style={styles.imageContainer}>
-                    <Image source={{uri: this.props.item.image}} style={styles.image}/>
+                    <Image source={{ uri: this.props.item.image }} style={styles.image} />
                 </View>
                 <TouchableOpacity style={styles.commentsContainer}>
                     <View style={styles.timeFlex}>

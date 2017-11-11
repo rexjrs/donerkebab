@@ -19,7 +19,6 @@ export default class AddPost extends Component {
         this.state = {
             type: 'Breakfast',
             description: '',
-            calsBurned: '',
             cals: '',
             image: null
         }
@@ -41,12 +40,8 @@ export default class AddPost extends Component {
             description: this.state.description,
             image: this.state.image,
             path: this.state.imagePath,
-            mime: this.state.mime
-        }
-        if (this.state.type === 'Exercise') {
-            data.calsBurned = this.state.calsBurned
-        } else {
-            data.cals = this.state.cals
+            mime: this.state.mime,
+            cals: this.state.cals
         }
         this.props.navigation.state.params.queueUpload(data)
         this.props.navigation.goBack()
@@ -148,8 +143,8 @@ export default class AddPost extends Component {
                             placeholder="Calories burned"
                             placeholderTextColor='rgba(170,170,170,0.9)'
                             keyboardType="number-pad"
-                            value={this.state.calsBurned}
-                            onChangeText={(val) => this.setState({ calsBurned: val })}
+                            value={this.state.cals}
+                            onChangeText={(val) => this.setState({ cals: val })}
                         />
                     }
                     {this.props.navigation.state.params.name !== 'Log Exercise' &&

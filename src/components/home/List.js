@@ -7,7 +7,8 @@ import {
     TouchableOpacity,
     FlatList,
     ActivityIndicator,
-    RefreshControl
+    RefreshControl,
+    LayoutAnimation
 } from 'react-native';
 import Post from './Post';
 import Spinner from 'react-native-spinkit';
@@ -22,7 +23,8 @@ import { observer, inject } from 'mobx-react';
         this.state = {
             dataSource: [],
             initialLoad: true,
-            refreshing: false
+            refreshing: false,
+            getData: 0
         }
         this.getData = this.getData.bind(this)
     }
@@ -31,6 +33,14 @@ import { observer, inject } from 'mobx-react';
         this.getData()
     }
 
+    componentWillReceiveProps(nextProps){
+        if(nextProps.getData !== this.state.getData){
+            this.getData()
+            this.setState({getData: nextProps.getData})
+        }
+    }
+    
+
     getData() {
         this.setState({
             refreshing: true
@@ -38,8 +48,14 @@ import { observer, inject } from 'mobx-react';
         getFeed(this.props.screenProps.db, this.props.mainStore.userData.id, (status, res) => {
             let tempArray = []
             let counter = 0
+            if(res.docs.length === 0){
+                this.setState({
+                    initialLoad: false,
+                    refreshing: false
+                })
+            }
             res.forEach((doc) => {
-                console.log(doc)
+                // console.log(doc.data().date)
                 let tempObj = {
                     calories: doc.data().calories,
                     date: doc.data().date,
@@ -60,9 +76,8 @@ import { observer, inject } from 'mobx-react';
                         tempArray.push(tempObj)
                         counter = counter + 1
                         if (counter === res.docs.length) {
-                            console.log(JSON.parse(JSON.stringify(tempArray)))
                             this.setState({
-                                dataSource: JSON.parse(JSON.stringify(tempArray)),
+                                dataSource: tempArray,
                                 initialLoad: false,
                                 refreshing: false
                             })

@@ -12,7 +12,6 @@ import * as firebase from 'firebase';
 import 'firebase/firestore';
 import { mainStore } from './src/stores/MainStore';
 import { Tabs, LoginStack } from './src/routing/Router';
-import { FakeImage } from './src/config/HelperFunctions';
 import { Provider, observer } from 'mobx-react';
 
 const config = {
@@ -23,7 +22,6 @@ const config = {
     storageBucket: "donerkebab-e1ded.appspot.com",
     messagingSenderId: "531243947613"
 };
-FakeImage.ensureImageExists(); //Workaround Firestore issue
 firebase.initializeApp(config);
 const db = firebase.firestore();
 const storage = firebase.storage().ref();

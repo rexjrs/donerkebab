@@ -5,16 +5,16 @@ import {
     Text,
     View,
     TouchableOpacity,
-    ScrollView,
     LayoutAnimation,
     TouchableWithoutFeedback
 } from 'react-native';
-import List from '../components/home/List';
 import LinearGradient from 'react-native-linear-gradient';
-import { uploadImage } from '../network/Firebase';
-import { Icon } from 'react-native-elements';
 import { observer, inject } from 'mobx-react';
 import moment from 'moment';
+import { Icon } from 'react-native-elements';
+import { createPost } from '../network/Firebase';
+import List from '../components/home/List';
+import InQueue from '../components/home/InQueue';
 
 @inject('mainStore')
 @observer export default class Home extends Component {
@@ -23,22 +23,56 @@ import moment from 'moment';
         this.state = {
             showBtn: true,
             foodBtn: 10,
-            exerciseBtn: 20
+            exerciseBtn: 20,
+            inQueue: [],
+            getData: 0
         }
         this.queueUpload = this.queueUpload.bind(this)
     }
 
     queueUpload(data) {
-        const imageRef = this.props.screenProps.storage.child("images/"+this.props.mainStore.userData.id+moment().format('YYYYMMDDhmmss')+".jpg")
-        uploadImage(
-            this.props.screenProps.db, 
+        let id = moment().format('mmssa')
+        let queueArray = JSON.parse(JSON.stringify(this.state.inQueue))
+        queueArray.push({
+            id: id,
+            desc: data.description,
+            progress: 0
+        })
+        this.setState({
+            inQueue: queueArray
+        })
+        const imageRef = this.props.screenProps.storage.child("images/" + this.props.mainStore.userData.id + moment().format('YYYYMMDDhmmss') + ".jpg")
+        createPost(
+            this.props.screenProps.db,
             this.props.screenProps.db.collection('users').doc(this.props.mainStore.userData.id),
-            this.props.screenProps.timestamp, 
-            data, 
-            this.props.mainStore.userData.id, 
+            this.props.screenProps.timestamp,
+            data,
+            this.props.mainStore.userData.id,
             imageRef,
-            (result)=>{
-                console.log(result)
+            (progress) => {
+                let tempArray = JSON.parse(JSON.stringify(this.state.inQueue))
+                tempArray.map((b, i) => {
+                    if (b.id === id) {
+                        b.progress = progress
+                    }
+                })
+                this.setState({
+                    inQueue: tempArray
+                })
+            },
+            (result) => {
+                let tempArray = JSON.parse(JSON.stringify(this.state.inQueue))
+                let index;
+                tempArray.map((b, i) => {
+                    if (b.id === id) {
+                        index = i
+                    }
+                })
+                tempArray.splice(index, 1)
+                this.setState({
+                    inQueue: tempArray,
+                    getData: this.state.getData+1
+                })
             }
         )
     }
@@ -70,13 +104,27 @@ import moment from 'moment';
         })
     }
 
+    renderQueue(data) {
+        let mapped = data.map((b, i) => {
+            return (
+                <InQueue
+                    key={i}
+                    desc={b.desc}
+                    progress={b.progress}
+                />
+            )
+        })
+        return mapped
+    }
+
     render() {
         return (
             <LinearGradient
                 colors={['#102037', '#1e3353']}
                 style={styles.container}
             >
-                <List screenProps={this.props.screenProps} />
+                {this.renderQueue(this.state.inQueue)}
+                <List screenProps={this.props.screenProps} getData={this.state.getData}/>
                 <TouchableOpacity onPress={() => this.navigate('Log Meal')} style={[styles.foodBtn, { bottom: this.state.foodBtn }]}>
                     <Icon name="ios-restaurant" type="ionicon" size={35} color="#6764fe" />
                 </TouchableOpacity>
