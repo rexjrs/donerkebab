@@ -12,6 +12,7 @@ import {
     AsyncStorage
 } from 'react-native';
 import * as firebase from 'firebase';
+import Spinner from 'react-native-spinkit';
 import LinearGradient from 'react-native-linear-gradient';
 import { getUserData } from '../../../src/network/Firebase';
 import { observer, inject } from 'mobx-react';
@@ -78,6 +79,7 @@ import { observer, inject } from 'mobx-react';
                             value={this.state.password}
                             onChangeText={(val) => this.setState({ password: val })}
                         />
+                        <Spinner isVisible={true} type="9CubeGrid" size={40} color="white" />
                         <TouchableOpacity onPress={this.login} style={styles.submitBtn}>
                             <Text style={styles.submitText}>Login</Text>
                         </TouchableOpacity>
