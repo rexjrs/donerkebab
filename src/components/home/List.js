@@ -40,7 +40,7 @@ import Post from './Post';
       refreshing: true,
     });
     getFeed(this.props.screenProps.db, this.props.mainStore.userData.id, (status, res) => {
-      let tempArray = [];
+      const tempArray = [];
       let counter = 0;
       if (res.docs.length === 0) {
         this.setState({
@@ -50,7 +50,7 @@ import Post from './Post';
       }
       res.forEach((doc) => {
         // console.log(doc.data().date)
-        let tempObj = {
+        const tempObj = {
           calories: doc.data().calories,
           date: doc.data().date,
           description: doc.data().description,

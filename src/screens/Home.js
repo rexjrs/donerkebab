@@ -30,7 +30,7 @@ import InQueue from '../components/home/InQueue';
 
   queueUpload(data) {
     const id = moment().format('mmssa');
-    let queueArray = [...this.state.inQueue];
+    const queueArray = [...this.state.inQueue];
     queueArray.push({
       id: id,
       desc: data.description,
@@ -48,7 +48,7 @@ import InQueue from '../components/home/InQueue';
       this.props.mainStore.userData.id,
       imageRef,
       (progress) => {
-        let tempArray = [...this.state.inQueue];
+        const tempArray = [...this.state.inQueue];
         tempArray.forEach((b, i) => {
           if (b.id === id) {
             tempArray[i].progress = progress;
@@ -59,7 +59,7 @@ import InQueue from '../components/home/InQueue';
         });
       },
       () => {
-        let tempArray = [...this.state.inQueue];
+        const tempArray = [...this.state.inQueue];
         let index;
         tempArray.forEach((b, i) => {
           if (b.id === id) {
