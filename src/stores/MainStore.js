@@ -8,8 +8,6 @@ class MainStore {
     // Navigators
     @observable previousTrackingTab = 'Calories';
     @observable trackingTab = 'Calories';
-    
-
 }
 
 export var mainStore = new MainStore;
