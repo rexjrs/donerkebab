@@ -25,14 +25,14 @@ import InQueue from '../components/home/InQueue';
             foodBtn: 10,
             exerciseBtn: 20,
             inQueue: [],
-            getData: 0
+            getData: 0,
         }
         this.queueUpload = this.queueUpload.bind(this)
     }
 
     queueUpload(data) {
-        let id = moment().format('mmssa')
-        let queueArray = JSON.parse(JSON.stringify(this.state.inQueue))
+        const id = moment().format('mmssa')
+        let queueArray = [...this.state.inQueue]
         queueArray.push({
             id: id,
             desc: data.description,
@@ -50,7 +50,7 @@ import InQueue from '../components/home/InQueue';
             this.props.mainStore.userData.id,
             imageRef,
             (progress) => {
-                let tempArray = JSON.parse(JSON.stringify(this.state.inQueue))
+                let tempArray = [...this.state.inQueue]
                 tempArray.map((b, i) => {
                     if (b.id === id) {
                         b.progress = progress
@@ -61,7 +61,7 @@ import InQueue from '../components/home/InQueue';
                 })
             },
             (result) => {
-                let tempArray = JSON.parse(JSON.stringify(this.state.inQueue))
+                let tempArray = [...this.state.inQueue]
                 let index;
                 tempArray.map((b, i) => {
                     if (b.id === id) {

@@ -22,27 +22,17 @@ import { observer, inject } from 'mobx-react';
     constructor(props) {
         super(props)
         this.state = {
-
         }
         this.login = this.login.bind(this)
+        this.fetchUser = this.fetchUser.bind(this)
     }
 
-    login() {
-        firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
-            .then((user) => {
-                user.getIdToken().then((token) => {
-                    AsyncStorage.setItem('token', token);
-                    AsyncStorage.setItem('email', this.state.email);
-                    this.fetchUser(token);
-                });
-            })
-            .catch((err) => {
-                console.warn('Failed')
-            });
+    login(){
+        this.props.navigation.navigate('Login', {fetchUser: this.fetchUser})
     }
 
-    fetchUser(token) {
-        getUserData(this.props.screenProps.db, this.state.email, (res) => {
+    fetchUser(token, email) {
+        getUserData(this.props.screenProps.db, email, (res) => {
             LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
             AsyncStorage.setItem('id', res);
             this.props.mainStore.userData = {
@@ -61,25 +51,7 @@ import { observer, inject } from 'mobx-react';
                 style={styles.container}
             >
                 <ScrollView style={styles.scrollView} scrollEnabled={false}>
-                    <View style={styles.centerItems}>
-                        <TextInput
-                            style={styles.desc}
-                            placeholder='Email'
-                            placeholderTextColor='rgba(170,170,170,0.9)'
-                            value={this.state.email}
-                            onChangeText={(val) => this.setState({ email: val })}
-                            autoCapitalize='none'
-                            autoCorrect={false}
-                        />
-                        <TextInput
-                            style={styles.desc}
-                            placeholder='Password'
-                            placeholderTextColor='rgba(170,170,170,0.9)'
-                            secureTextEntry={true}
-                            value={this.state.password}
-                            onChangeText={(val) => this.setState({ password: val })}
-                        />
-                        <Spinner isVisible={true} type="9CubeGrid" size={40} color="white" />
+                    <View style={[styles.centerItems]}>
                         <TouchableOpacity onPress={this.login} style={styles.submitBtn}>
                             <Text style={styles.submitText}>Login</Text>
                         </TouchableOpacity>
@@ -104,6 +76,14 @@ const window = Dimensions.get('window');
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    error: {
+        borderColor: 'red',
+        borderWidth: 1
+    },
+    centerSpinner: {
+        alignItems: 'center',
+        marginTop: 10
     },
     scrollView: {
         flex: 1,
@@ -149,15 +129,5 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         fontWeight: '700',
         fontSize: 20
-    },
-    desc: {
-        color: 'white',
-        borderRadius: 20,
-        height: 40,
-        marginHorizontal: 10,
-        paddingVertical: 3,
-        backgroundColor: '#122333',
-        marginTop: 10,
-        textAlign: 'center'
-    },
+    }
 });

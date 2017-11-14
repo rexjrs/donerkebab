@@ -21,6 +21,7 @@ import Personal from '../screens/more/Personal';
 
 import MainPage from '../screens/login/MainPage';
 import SignUp from '../screens/login/SignUp';
+import Login from '../screens/login/LoginPage';
 
 export const transparentHeader = {
     position: 'absolute',
@@ -42,6 +43,19 @@ export const LoginStack = StackNavigator({
         navigationOptions: {
             header: false
         },
+    },
+    Login: {
+        screen: Login,
+        navigationOptions: props => ({
+            headerStyle: transparentHeader,
+            title: 'Sign Up',
+            headerTitleStyle: headerTitleStyle,
+            headerLeft: (
+                <TouchableOpacity onPress={() => props.navigation.goBack()} style={{ paddingLeft: 20 }}>
+                    <Icon name="md-arrow-round-back" type="ionicon" size={30} color="#6963f9" />
+                </TouchableOpacity>
+            )
+        }),
     },
     SignUp: {
         screen: SignUp,
